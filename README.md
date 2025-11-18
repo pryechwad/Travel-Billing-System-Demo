@@ -135,19 +135,10 @@ Customize tour packages in:
 - `src/components/InvoiceForm.jsx` - Available tour options
 - `src/utils/sampleData.js` - Sample tour data
 
-## 📄 License
-
-This project is licensed under the MIT License.
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📞 Support
-
-For support and queries:
-- Email: info@travelbillpro.com
-- Phone: +91-9876543210
 
 ---
 
