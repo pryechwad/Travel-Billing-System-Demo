@@ -5,7 +5,7 @@ import InvoiceForm from './components/InvoiceForm'
 import InvoicePreview from './components/InvoicePreview'
 import InvoiceList from './components/InvoiceList'
 import CustomerList from './components/CustomerList'
-import LogoManager from './components/LogoManager'
+import CompanySettings from './components/CompanySettings'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 
@@ -61,8 +61,8 @@ function AppContent() {
         return <InvoiceList />
       case 'customers':
         return <CustomerList />
-      case 'logo-manager':
-        return <LogoManager />
+      case 'company-settings':
+        return <CompanySettings />
       default:
         return <Dashboard onCreateInvoice={() => setCurrentView('create-invoice')} />
     }

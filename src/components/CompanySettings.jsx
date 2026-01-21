@@ -1,33 +1,56 @@
 import { useState, useRef } from 'react'
 import { useLogo } from '../contexts/LogoContext'
+import { useNotification } from './Notification'
 
-const LogoManager = () => {
+const CompanySettings = () => {
   const { currentLogo, companyName, companyDetails, logoSettings, uploadLogo, resetToDefault, updateCompanyName, resetCompanyName, updateCompanyDetails, resetCompanyDetails, updateSettings } = useLogo()
+  const { showNotification, NotificationComponent } = useNotification()
   const [isUploading, setIsUploading] = useState(false)
   const [tempCompanyName, setTempCompanyName] = useState(companyName)
   const [tempCompanyDetails, setTempCompanyDetails] = useState(companyDetails)
   const fileInputRef = useRef(null)
+
+  const bankNames = [
+    'State Bank of India',
+    'HDFC Bank',
+    'ICICI Bank',
+    'Axis Bank',
+    'Kotak Mahindra Bank',
+    'IndusInd Bank',
+    'Yes Bank',
+    'IDFC First Bank',
+    'Punjab National Bank',
+    'Bank of Baroda',
+    'Canara Bank',
+    'Union Bank of India',
+    'Bank of India',
+    'Central Bank of India',
+    'Indian Overseas Bank',
+    'UCO Bank',
+    'Indian Bank',
+    'Punjab & Sind Bank'
+  ]
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0]
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+      showNotification('Please select an image file (PNG, JPG, SVG)', 'warning')
       return
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      alert('File size must be less than 2MB')
+      showNotification('File size must be less than 2MB', 'warning')
       return
     }
 
     setIsUploading(true)
     try {
       await uploadLogo(file)
-      alert('Logo uploaded successfully!')
+      showNotification('Logo uploaded successfully!', 'success')
     } catch (error) {
-      alert('Error uploading logo: ' + error.message)
+      showNotification('Error uploading logo: ' + error.message, 'error')
     } finally {
       setIsUploading(false)
       event.target.value = ''
@@ -37,20 +60,20 @@ const LogoManager = () => {
   const handleReset = () => {
     if (confirm('Reset to default logo? This action cannot be undone.')) {
       resetToDefault()
-      alert('Logo reset to default!')
+      showNotification('Logo reset to default!', 'success')
     }
   }
 
   const handleCompanyNameSave = () => {
     updateCompanyName(tempCompanyName)
-    alert('Company name updated successfully!')
+    showNotification('Company name updated successfully!', 'success')
   }
 
   const handleCompanyNameReset = () => {
     if (confirm('Reset company name to default?')) {
       resetCompanyName()
       setTempCompanyName('Travel Bill Pro')
-      alert('Company name reset to default!')
+      showNotification('Company name reset to default!', 'success')
     }
   }
 
@@ -141,13 +164,16 @@ const LogoManager = () => {
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
-              <input
-                type="text"
+              <select
                 value={tempCompanyDetails.bankName}
                 onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, bankName: e.target.value})}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="State Bank of India"
-              />
+              >
+                <option value="">Select Bank</option>
+                {bankNames.map((bank, index) => (
+                  <option key={index} value={bank}>{bank}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
@@ -182,13 +208,13 @@ const LogoManager = () => {
           </div>
           <div className="flex gap-4">
             <button
-              onClick={() => { updateCompanyDetails(tempCompanyDetails); alert('Company details updated!'); }}
+              onClick={() => { updateCompanyDetails(tempCompanyDetails); showNotification('Company details updated successfully!', 'success'); }}
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
             >
               Save Company Details
             </button>
             <button
-              onClick={() => { resetCompanyDetails(); setTempCompanyDetails(companyDetails); alert('Company details reset!'); }}
+              onClick={() => { resetCompanyDetails(); setTempCompanyDetails(companyDetails); showNotification('Company details reset to default!', 'success'); }}
               className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
             >
               Reset to Default
@@ -325,8 +351,9 @@ const LogoManager = () => {
           </div>
         </div>
       </div>
+      {NotificationComponent}
     </div>
   )
 }
 
-export default LogoManager
+export default CompanySettings
