@@ -1,6 +1,8 @@
-import jsPDF from 'jspdf'
+import { downloadPDF } from '../utils/pdfGenerator'
+import { useLogo } from '../contexts/LogoContext'
 
 const InvoicePreview = ({ invoice }) => {
+  const { currentLogo, logoSettings } = useLogo()
   const subtotal = invoice.items.reduce((sum, item) => sum + (item.qty * item.price), 0)
   const discountAmount = (subtotal * invoice.discount) / 100
   const taxableAmount = subtotal - discountAmount
@@ -8,113 +10,8 @@ const InvoicePreview = ({ invoice }) => {
   const total = taxableAmount + taxAmount
 
   const exportToPDF = () => {
-    const doc = new jsPDF()
-    
-    // Company Header
-    doc.setFontSize(24)
-    doc.setTextColor(41, 128, 185)
-    doc.text('Tours & TRAVELS', 20, 25)
-    
-    doc.setFontSize(10)
-    doc.setTextColor(100, 100, 100)
-    doc.text('Your Journey, Our Passion', 20, 32)
-    doc.text('Email: info@travels.com | Phone: +91 98765 43210', 20, 38)
-    doc.text('Address: 123 Travel Street, Mumbai, Maharashtra 400001', 20, 44)
-    
-    // Invoice Title
-    doc.setFontSize(20)
-    doc.setTextColor(0, 0, 0)
-    doc.text('TRAVEL INVOICE', 20, 60)
-    
-    // Invoice Details
-    doc.setFontSize(11)
-    doc.text(`Invoice Number: ${invoice.invoiceNumber}`, 20, 75)
-    doc.text(`Date: ${new Date(invoice.date).toLocaleDateString('en-IN')}`, 20, 82)
-    if (invoice.travelDate) {
-      doc.text(`Travel Date: ${new Date(invoice.travelDate).toLocaleDateString('en-IN')}`, 20, 89)
-    }
-    
-    // Customer Details
-    doc.setFontSize(12)
-    doc.text('BILL TO:', 20, 105)
-    doc.setFontSize(11)
-    doc.text(invoice.customerName || 'Customer Name', 20, 115)
-    if (invoice.customerEmail) doc.text(invoice.customerEmail, 20, 122)
-    if (invoice.customerPhone) doc.text(invoice.customerPhone, 20, 129)
-    if (invoice.customerAddress) doc.text(invoice.customerAddress, 20, 136)
-    
-    // Payment Mode
-    if (invoice.paymentMode) {
-      doc.text(`Payment Mode: ${invoice.paymentMode.toUpperCase()}`, 120, 115)
-    }
-    
-    // Table Header
-    const startY = 155
-    doc.setFillColor(240, 240, 240)
-    doc.rect(20, startY, 170, 8, 'F')
-    
-    doc.setFontSize(10)
-    doc.setTextColor(0, 0, 0)
-    doc.text('Tour Package', 22, startY + 5)
-    doc.text('Travelers', 120, startY + 5)
-    doc.text('Price', 145, startY + 5)
-    doc.text('Total', 170, startY + 5)
-    
-    // Items
-    let yPos = startY + 15
-    doc.setFontSize(9)
-    invoice.items.forEach(item => {
-      const tourName = item.tourName || 'Tour Package'
-      if (tourName.length > 35) {
-        const lines = doc.splitTextToSize(tourName, 90)
-        doc.text(lines, 22, yPos)
-        yPos += (lines.length - 1) * 4
-      } else {
-        doc.text(tourName, 22, yPos)
-      }
-      
-      doc.text(item.qty.toString(), 125, yPos)
-      doc.text(`₹${item.price.toLocaleString()}`, 145, yPos)
-      doc.text(`₹${(item.qty * item.price).toLocaleString()}`, 170, yPos)
-      yPos += 12
-    })
-    
-    // Totals
-    yPos += 10
-    doc.line(120, yPos, 190, yPos)
-    yPos += 8
-    
-    doc.setFontSize(10)
-    doc.text(`Subtotal:`, 120, yPos)
-    doc.text(`₹${subtotal.toLocaleString()}`, 170, yPos)
-    
-    if (invoice.discount > 0) {
-      yPos += 7
-      doc.text(`Discount (${invoice.discount}%):`, 120, yPos)
-      doc.text(`-₹${discountAmount.toLocaleString()}`, 170, yPos)
-    }
-    
-    yPos += 7
-    doc.text(`Tax (${invoice.taxRate}%):`, 120, yPos)
-    doc.text(`₹${taxAmount.toLocaleString()}`, 170, yPos)
-    
-    yPos += 10
-    doc.line(120, yPos, 190, yPos)
-    yPos += 8
-    
-    doc.setFontSize(12)
-    doc.setFont(undefined, 'bold')
-    doc.text(`TOTAL AMOUNT:`, 120, yPos)
-    doc.text(`₹${total.toLocaleString()}`, 170, yPos)
-    
-    // Footer
-    doc.setFontSize(8)
-    doc.setFont(undefined, 'normal')
-    doc.setTextColor(100, 100, 100)
-    doc.text('Thank you for choosing Wanderlust Travels!', 20, 270)
-    doc.text('Terms: Payment due within 30 days. Cancellation charges apply as per policy.', 20, 277)
-    
-    doc.save(`travel-invoice-${invoice.invoiceNumber}.pdf`)
+    const logoToUse = (invoice.showLogo !== false) ? currentLogo : null
+    downloadPDF(invoice, logoToUse)
   }
 
   return (
@@ -136,13 +33,24 @@ const InvoicePreview = ({ invoice }) => {
         {/* Invoice Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">TRAVEL BILL PRO</h1>
-              <p className="text-blue-100">Your Ultimate Solution for Billing</p>
-              <div className="text-sm text-blue-100 mt-2 space-y-1">
-                <p>Email: info@travelbillpro.com</p>
-                <p>Phone: +91-9876543210</p>
-                <p>Mumbai, Maharashtra 400001</p>
+            <div className="flex items-center gap-4">
+              {(invoice.showLogo !== false) && (
+                <div className="w-12 h-12 bg-white rounded-lg p-2 flex items-center justify-center">
+                  <img 
+                    src={currentLogo} 
+                    alt="Company Logo" 
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+              )}
+              <div>
+                <h1 className="text-3xl font-bold mb-2">TRAVEL BILL PRO</h1>
+                <p className="text-blue-100">Your Ultimate Solution for Billing</p>
+                <div className="text-sm text-blue-100 mt-2 space-y-1">
+                  <p>Email: info@travelbillpro.com</p>
+                  <p>Phone: +91-9876543210</p>
+                  <p>Mumbai, Maharashtra 400001</p>
+                </div>
               </div>
             </div>
             <div className="mt-4 md:mt-0 text-right">

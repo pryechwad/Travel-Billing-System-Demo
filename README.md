@@ -29,11 +29,26 @@ A comprehensive travel billing and invoice management system built with React an
 - Amount in words conversion
 - Contact information for future bookings
 - Terms & conditions
+- **Logo Management System**
+  - Upload custom logos (SVG, PNG, JPG)
+  - Reset to default professional logo
+  - Toggle logo display per invoice
+  - Responsive logo sizing
+  - Logo appears in PDFs and application
 
 ### 👥 Customer Management
 - Customer database
 - Contact information storage
 - Invoice history tracking
+
+### 🎨 Logo Management
+- **Default Logo**: Professional SVG logo loads automatically
+- **Logo Upload**: Upload custom logos (SVG, PNG, JPG, max 2MB)
+- **Logo Reset**: One-click reset to default logo
+- **Invoice Control**: Toggle logo on/off per individual invoice
+- **PDF Integration**: Logo properly positioned in PDF exports
+- **Responsive Design**: Logo displays correctly on all screen sizes
+- **Settings Panel**: Configure logo visibility and size preferences
 
 ### 💰 Payment Tracking
 - Multiple payment modes (Cash, Card, UPI, Net Banking, Cheque, Bank Transfer)
@@ -76,6 +91,14 @@ npm run dev
 - **Local Storage** - Data persistence
 
 ## 📱 Features Overview
+
+### Logo Management
+- Upload custom company logos
+- Support for SVG, PNG, and JPG formats
+- Automatic resizing and optimization
+- Per-invoice logo toggle control
+- Professional default logo fallback
+- Responsive display across all devices
 
 ### Invoice Creation
 - Add multiple tour packages
@@ -125,7 +148,9 @@ The application includes sample invoice data for testing:
 ## 🔧 Configuration
 
 ### Company Branding
-Update company details in:
+Update company details and logo in:
+- `src/components/LogoManager.jsx` - Logo upload and management
+- `src/contexts/LogoContext.jsx` - Logo state management
 - `src/utils/pdfGenerator.js` - PDF header information
 - `src/components/Dashboard.jsx` - Company name and tagline
 - `src/components/Sidebar.jsx` - Logo and branding
@@ -135,19 +160,7 @@ Customize tour packages in:
 - `src/components/InvoiceForm.jsx` - Available tour options
 - `src/utils/sampleData.js` - Sample tour data
 
-## 📄 License
 
-This project is licensed under the MIT License.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📞 Support
-
-For support and queries:
-- Email: info@travelbillpro.com
-- Phone: +91-9876543210
 
 ---
 

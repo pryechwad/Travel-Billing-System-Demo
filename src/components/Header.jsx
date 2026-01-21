@@ -1,6 +1,8 @@
 import { downloadPDF } from '../utils/pdfGenerator'
+import { useLogo } from '../contexts/LogoContext'
 
 const Header = ({ currentView, setCurrentView, invoice, resetInvoice, toggleSidebar }) => {
+  const { currentLogo, logoSettings } = useLogo()
   const getPageTitle = () => {
     switch (currentView) {
       case 'dashboard': return 'Dashboard'
@@ -8,6 +10,7 @@ const Header = ({ currentView, setCurrentView, invoice, resetInvoice, toggleSide
       case 'preview-invoice': return 'Invoice Preview'
       case 'invoices': return 'All Invoices'
       case 'customers': return 'Customer Management'
+      case 'logo-manager': return 'Logo Management'
       default: return 'Travel Billing'
     }
   }
@@ -68,7 +71,10 @@ const Header = ({ currentView, setCurrentView, invoice, resetInvoice, toggleSide
               {currentView === 'preview-invoice' && (
                 <>
                   <button
-                    onClick={() => downloadPDF(invoice)}
+                    onClick={() => {
+                      const logoToUse = (invoice.showLogo !== false) ? currentLogo : null
+                      downloadPDF(invoice, logoToUse)
+                    }}
                     className="bg-red-600 hover:bg-red-700 text-white px-3 md:px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-1 md:gap-2 text-sm md:text-base"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

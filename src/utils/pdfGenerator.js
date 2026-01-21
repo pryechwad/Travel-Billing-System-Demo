@@ -1,19 +1,52 @@
 import jsPDF from 'jspdf'
+import { defaultLogo } from './defaultLogo'
 
-export const generateInvoicePDF = (invoice) => {
+export const generateInvoicePDF = (invoice, customLogo = null) => {
   const pdf = new jsPDF()
   
   // Header
   pdf.setFillColor(41, 128, 185)
   pdf.rect(0, 0, 210, 35, 'F')
   
-  // Company Logo
-  pdf.setFillColor(255, 255, 255)
-  pdf.circle(25, 18, 8, 'F')
-  pdf.setFontSize(8)
-  pdf.setFont('helvetica', 'bold')
-  pdf.setTextColor(41, 128, 185)
-  pdf.text('TBP', 21, 20)
+  // Company Logo - Only show if enabled
+  if (invoice.showLogo !== false) {
+    const logoToUse = customLogo || defaultLogo
+    console.log('Adding logo to PDF:', { logoToUse: logoToUse.substring(0, 50) })
+    
+    try {
+      // Try different formats for better compatibility
+      if (logoToUse.includes('data:image/svg')) {
+        // For SVG, try as PNG
+        pdf.addImage(logoToUse, 'PNG', 17, 10, 16, 16)
+      } else if (logoToUse.includes('data:image/png')) {
+        pdf.addImage(logoToUse, 'PNG', 17, 10, 16, 16)
+      } else if (logoToUse.includes('data:image/jpeg') || logoToUse.includes('data:image/jpg')) {
+        pdf.addImage(logoToUse, 'JPEG', 17, 10, 16, 16)
+      } else {
+        // Default to PNG
+        pdf.addImage(logoToUse, 'PNG', 17, 10, 16, 16)
+      }
+      console.log('Logo added successfully to PDF')
+    } catch (error) {
+      console.warn('Could not add logo to PDF:', error)
+      // Fallback to text logo
+      pdf.setFillColor(255, 255, 255)
+      pdf.circle(25, 18, 8, 'F')
+      pdf.setFontSize(8)
+      pdf.setFont('helvetica', 'bold')
+      pdf.setTextColor(41, 128, 185)
+      pdf.text('TBP', 21, 20)
+    }
+  } else {
+    console.log('Logo disabled for this invoice')
+    // Show text logo when logo is disabled
+    pdf.setFillColor(255, 255, 255)
+    pdf.circle(25, 18, 8, 'F')
+    pdf.setFontSize(8)
+    pdf.setFont('helvetica', 'bold')
+    pdf.setTextColor(41, 128, 185)
+    pdf.text('TBP', 21, 20)
+  }
   
   // Company Name
   pdf.setFontSize(20)
@@ -304,13 +337,17 @@ const convertToWords = (num) => {
   return 'Amount too large'
 }
 
-export const downloadPDF = (invoice) => {
+export const downloadPDF = (invoice, customLogo = null) => {
   try {
-    console.log('Generating PDF with new format...', invoice)
-    const pdf = generateInvoicePDF(invoice)
+    console.log('Generating PDF with logo:', {
+      hasCustomLogo: !!customLogo,
+      showLogo: invoice.showLogo,
+      logoType: customLogo ? customLogo.substring(0, 20) : 'none'
+    })
+    const pdf = generateInvoicePDF(invoice, customLogo)
     const timestamp = new Date().getTime()
     pdf.save(`TravelBillPro_Receipt_${invoice.invoiceNumber}_${timestamp}.pdf`)
-    console.log('PDF generated successfully with new format')
+    console.log('PDF generated successfully with logo support')
   } catch (error) {
     console.error('Error generating PDF:', error)
     alert('Error generating PDF: ' + error.message)

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { storage } from '../utils/storage'
+import ResponsiveLogo from './ResponsiveLogo'
 
 const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
   const [isSaving, setIsSaving] = useState(false)
@@ -88,9 +89,7 @@ const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
           </button>
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">TBP</span>
-              </div>
+              <ResponsiveLogo size="medium" />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Travel Bill Pro</h1>
             </div>
             <p className="text-gray-600">Create New Invoice - #{invoice.invoiceNumber}</p>
@@ -262,7 +261,7 @@ const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
             <input
@@ -286,6 +285,18 @@ const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
               <option value="cheque">Cheque</option>
               <option value="bank_transfer">Bank Transfer</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Show Logo in PDF</label>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={invoice.showLogo}
+                onChange={(e) => setInvoice(prev => ({ ...prev, showLogo: e.target.checked }))}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
           </div>
         </div>
 

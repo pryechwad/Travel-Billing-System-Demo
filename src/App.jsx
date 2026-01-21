@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { LogoProvider } from './contexts/LogoContext'
 import Dashboard from './components/Dashboard'
 import InvoiceForm from './components/InvoiceForm'
 import InvoicePreview from './components/InvoicePreview'
 import InvoiceList from './components/InvoiceList'
 import CustomerList from './components/CustomerList'
+import LogoManager from './components/LogoManager'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 
@@ -20,10 +22,19 @@ const createInitialInvoice = () => ({
   discount: 0,
   paymentMode: 'cash',
   advanceAmount: 0,
-  dueDate: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0]
+  dueDate: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0],
+  showLogo: true
 })
 
 function App() {
+  return (
+    <LogoProvider>
+      <AppContent />
+    </LogoProvider>
+  )
+}
+
+function AppContent() {
   const [currentView, setCurrentView] = useState('dashboard')
   const [currentInvoice, setCurrentInvoice] = useState(createInitialInvoice)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
@@ -50,6 +61,8 @@ function App() {
         return <InvoiceList />
       case 'customers':
         return <CustomerList />
+      case 'logo-manager':
+        return <LogoManager />
       default:
         return <Dashboard onCreateInvoice={() => setCurrentView('create-invoice')} />
     }
