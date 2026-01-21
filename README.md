@@ -160,6 +160,12 @@ Customize tour packages in:
 - `src/components/InvoiceForm.jsx` - Available tour options
 - `src/utils/sampleData.js` - Sample tour data
 
+<<<<<<< HEAD
+=======
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+>>>>>>> 2f6644b57ddd53664356deed7a5f299c61e226f5
 
 
 ---
