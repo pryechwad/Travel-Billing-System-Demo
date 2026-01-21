@@ -2,7 +2,7 @@ import { downloadPDF } from '../utils/pdfGenerator'
 import { useLogo } from '../contexts/LogoContext'
 
 const Header = ({ currentView, setCurrentView, invoice, resetInvoice, toggleSidebar }) => {
-  const { currentLogo, logoSettings } = useLogo()
+  const { currentLogo, companyName, companyDetails, logoSettings } = useLogo()
   const getPageTitle = () => {
     switch (currentView) {
       case 'dashboard': return 'Dashboard'
@@ -72,8 +72,13 @@ const Header = ({ currentView, setCurrentView, invoice, resetInvoice, toggleSide
                 <>
                   <button
                     onClick={() => {
+                      // Force reload company data from localStorage
+                      const savedCompanyName = localStorage.getItem('travel-bill-company-name') || 'Travel Bill Pro'
+                      const savedCompanyDetails = localStorage.getItem('travel-bill-company-details')
+                      const actualCompanyDetails = savedCompanyDetails ? JSON.parse(savedCompanyDetails) : {}
+                      
                       const logoToUse = (invoice.showLogo !== false) ? currentLogo : null
-                      downloadPDF(invoice, logoToUse)
+                      downloadPDF(invoice, logoToUse, savedCompanyName, actualCompanyDetails)
                     }}
                     className="bg-red-600 hover:bg-red-700 text-white px-3 md:px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-1 md:gap-2 text-sm md:text-base"
                   >

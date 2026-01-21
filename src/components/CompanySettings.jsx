@@ -8,6 +8,7 @@ const CompanySettings = () => {
   const [isUploading, setIsUploading] = useState(false)
   const [tempCompanyName, setTempCompanyName] = useState(companyName)
   const [tempCompanyDetails, setTempCompanyDetails] = useState(companyDetails)
+  const [customBankName, setCustomBankName] = useState('')
   const fileInputRef = useRef(null)
 
   const bankNames = [
@@ -23,12 +24,7 @@ const CompanySettings = () => {
     'Bank of Baroda',
     'Canara Bank',
     'Union Bank of India',
-    'Bank of India',
-    'Central Bank of India',
-    'Indian Overseas Bank',
-    'UCO Bank',
-    'Indian Bank',
-    'Punjab & Sind Bank'
+    'Other'
   ]
 
   const handleFileUpload = async (event) => {
@@ -86,16 +82,26 @@ const CompanySettings = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         {/* Company Name Section */}
         <div className="mb-8">
-          <h3 className="text-lg font-medium text-gray-800 mb-4">Company Name</h3>
+          <h3 className="text-lg font-medium text-gray-800 mb-4">Company Name & Tagline</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Current: {companyName}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Company Name (Current: {companyName})</label>
               <input
                 type="text"
                 value={tempCompanyName}
                 onChange={(e) => setTempCompanyName(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter company name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Company Tagline</label>
+              <input
+                type="text"
+                value={tempCompanyDetails.tagline || ''}
+                onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, tagline: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Your Ultimate Solution for Professional Travel Billing"
               />
             </div>
             <div className="flex gap-4">
@@ -150,30 +156,50 @@ const CompanySettings = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
               <input
                 type="text"
-                value={tempCompanyDetails.address}
-                onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, address: e.target.value})}
+                value={tempCompanyDetails.website || ''}
+                onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, website: e.target.value})}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="City - Pincode"
+                placeholder="www.yourcompany.com"
               />
             </div>
           </div>
-          <h4 className="text-md font-medium text-gray-800 mb-3">Bank Account Details</h4>
+          <h4 className="text-md font-medium text-gray-800 mb-3">Payment Details</h4>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
-              <select
-                value={tempCompanyDetails.bankName}
-                onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, bankName: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select Bank</option>
-                {bankNames.map((bank, index) => (
-                  <option key={index} value={bank}>{bank}</option>
-                ))}
-              </select>
+              {tempCompanyDetails.bankName === 'Other' ? (
+                <input
+                  type="text"
+                  value={customBankName}
+                  onChange={(e) => {
+                    setCustomBankName(e.target.value)
+                    setTempCompanyDetails({...tempCompanyDetails, bankName: e.target.value})
+                  }}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter bank name"
+                />
+              ) : (
+                <select
+                  value={tempCompanyDetails.bankName}
+                  onChange={(e) => {
+                    if (e.target.value === 'Other') {
+                      setTempCompanyDetails({...tempCompanyDetails, bankName: 'Other'})
+                      setCustomBankName('')
+                    } else {
+                      setTempCompanyDetails({...tempCompanyDetails, bankName: e.target.value})
+                    }
+                  }}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select Bank</option>
+                  {bankNames.map((bank, index) => (
+                    <option key={index} value={bank}>{bank}</option>
+                  ))}
+                </select>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
@@ -203,6 +229,16 @@ const CompanySettings = () => {
                 onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, accountHolder: e.target.value})}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Company Name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
+              <input
+                type="text"
+                value={tempCompanyDetails.upiId}
+                onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, upiId: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="company@paytm"
               />
             </div>
           </div>

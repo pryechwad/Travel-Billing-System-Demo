@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { storage } from '../utils/storage'
 import ResponsiveLogo from './ResponsiveLogo'
+import { useNotification } from './Notification'
 
 const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
   const [isSaving, setIsSaving] = useState(false)
+  const { showNotification, NotificationComponent } = useNotification()
 
   const saveInvoice = async () => {
     if (!invoice.customerName || !invoice.items[0]?.tourName) {
-      alert('Please fill in customer name and at least one tour package')
+      showNotification('Please fill in customer name and at least one tour package', 'warning')
       return
     }
 
@@ -28,10 +30,10 @@ const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
         address: invoice.customerAddress
       })
       
-      alert('Invoice saved successfully!')
-      onBack()
+      showNotification('Invoice saved successfully!', 'success')
+      setTimeout(() => onBack(), 1500)
     } catch (error) {
-      alert('Error saving invoice: ' + error.message)
+      showNotification('Error saving invoice: ' + error.message, 'error')
     } finally {
       setIsSaving(false)
     }
@@ -317,6 +319,7 @@ const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
           </button>
         </div>
       </div>
+      {NotificationComponent}
     </div>
   )
 }

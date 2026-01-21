@@ -2,7 +2,7 @@ import { downloadPDF } from '../utils/pdfGenerator'
 import { useLogo } from '../contexts/LogoContext'
 
 const InvoicePreview = ({ invoice }) => {
-  const { currentLogo, logoSettings } = useLogo()
+  const { currentLogo, companyName, companyDetails,  } = useLogo()
   const subtotal = invoice.items.reduce((sum, item) => sum + (item.qty * item.price), 0)
   const discountAmount = (subtotal * invoice.discount) / 100
   const taxableAmount = subtotal - discountAmount
@@ -10,8 +10,19 @@ const InvoicePreview = ({ invoice }) => {
   const total = taxableAmount + taxAmount
 
   const exportToPDF = () => {
+    // Force reload company data from localStorage
+    const savedCompanyName = localStorage.getItem('travel-bill-company-name') || 'Travel Bill Pro'
+    const savedCompanyDetails = localStorage.getItem('travel-bill-company-details')
+    const actualCompanyDetails = savedCompanyDetails ? JSON.parse(savedCompanyDetails) : companyDetails
+    
+    console.log('Force loading from localStorage:', {
+      savedCompanyName,
+      actualCompanyDetails,
+      hasData: Object.keys(actualCompanyDetails).length > 0
+    })
+    
     const logoToUse = (invoice.showLogo !== false) ? currentLogo : null
-    downloadPDF(invoice, logoToUse)
+    downloadPDF(invoice, logoToUse, savedCompanyName, actualCompanyDetails)
   }
 
   return (
@@ -44,12 +55,12 @@ const InvoicePreview = ({ invoice }) => {
                 </div>
               )}
               <div>
-                <h1 className="text-3xl font-bold mb-2">TRAVEL BILL PRO</h1>
-                <p className="text-blue-100">Your Ultimate Solution for Billing</p>
+                <h1 className="text-3xl font-bold mb-2">{companyName.toUpperCase()}</h1>
+                <p className="text-blue-100">{companyDetails.tagline || 'Your Ultimate Solution for Professional Travel Billing'}</p>
                 <div className="text-sm text-blue-100 mt-2 space-y-1">
-                  <p>Email: info@travelbillpro.com</p>
-                  <p>Phone: +91-9876543210</p>
-                  <p>Mumbai, Maharashtra 400001</p>
+                  <p>Email: {companyDetails.email || 'info@travelbillpro.com'}</p>
+                  <p>Phone: {companyDetails.phone || '+91-9876543210'}</p>
+                  <p>{companyDetails.address || 'Mumbai, Maharashtra 400001'}</p>
                 </div>
               </div>
             </div>
@@ -112,39 +123,100 @@ const InvoicePreview = ({ invoice }) => {
             </table>
           </div>
 
-          {/* Totals */}
-          <div className="flex justify-end">
-            <div className="w-full md:w-80">
-              <div className="space-y-3">
+          {/* Billing Summary */}
+          <div className="mb-8">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 max-w-md">
+              <h3 className="font-semibold text-gray-800 mb-4 text-center">BILLING SUMMARY</h3>
+              <div className="space-y-2">
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal:</span>
-                  <span>₹{subtotal.toLocaleString()}</span>
+                  <span>Rs.{subtotal.toLocaleString()}</span>
                 </div>
                 {invoice.discount > 0 && (
                   <div className="flex justify-between text-gray-700">
                     <span>Discount ({invoice.discount}%):</span>
-                    <span>-₹{discountAmount.toLocaleString()}</span>
+                    <span>-Rs.{discountAmount.toLocaleString()}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-gray-700">
-                  <span>Tax ({invoice.taxRate}%):</span>
-                  <span>₹{taxAmount.toLocaleString()}</span>
+                  <span>CGST ({(invoice.taxRate || 18)/2}%):</span>
+                  <span>Rs.{Math.round(taxAmount/2).toLocaleString()}</span>
                 </div>
-                <div className="border-t border-gray-200 pt-3">
-                  <div className="flex justify-between text-xl font-bold text-gray-900">
-                    <span>Total Amount:</span>
-                    <span>₹{total.toLocaleString()}</span>
+                <div className="flex justify-between text-gray-700">
+                  <span>SGST ({(invoice.taxRate || 18)/2}%):</span>
+                  <span>Rs.{Math.round(taxAmount/2).toLocaleString()}</span>
+                </div>
+                <div className="border-t border-gray-300 pt-2 mt-3">
+                  <div className="flex justify-between text-lg font-bold text-white bg-black px-3 py-2 rounded">
+                    <span>TOTAL AMOUNT:</span>
+                    <span>Rs.{Math.round(total).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Payment Breakdown Table */}
+          <div className="mb-8">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+              <div className="bg-gray-100 px-4 py-3 border-b border-gray-200">
+                <h3 className="font-semibold text-gray-800 text-center">PAYMENT BREAKDOWN</h3>
+              </div>
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="text-left py-3 px-4 font-semibold text-gray-800">Description</th>
+                    <th className="text-center py-3 px-4 font-semibold text-gray-800">Amount (Rs.)</th>
+                    <th className="text-center py-3 px-4 font-semibold text-gray-800">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoice.advanceAmount > 0 && (
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-gray-700">Advance Amount</td>
+                      <td className="text-center py-3 px-4 text-gray-700">{invoice.advanceAmount.toLocaleString()}</td>
+                      <td className="text-center py-3 px-4 text-gray-700">{new Date(invoice.date).toLocaleDateString('en-IN')}</td>
+                    </tr>
+                  )}
+                  <tr className="border-b border-gray-100">
+                    <td className="py-3 px-4 text-gray-700">Pending Amount</td>
+                    <td className="text-center py-3 px-4 text-gray-700">{Math.round(total - (invoice.advanceAmount || 0)).toLocaleString()}</td>
+                    <td className="text-center py-3 px-4 text-gray-700">{invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-IN') : '-'}</td>
+                  </tr>
+                  <tr className="bg-gray-50">
+                    <td className="py-3 px-4 font-semibold text-gray-800">Total Amount</td>
+                    <td className="text-center py-3 px-4 font-semibold text-gray-800">{Math.round(total).toLocaleString()}</td>
+                    <td className="text-center py-3 px-4 font-semibold text-gray-800">-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           {/* Footer */}
           <div className="mt-12 pt-8 border-t border-gray-200">
-            <div className="text-center text-gray-600">
-              <p className="font-medium mb-2">Thank you for choosing Wanderlust Travels!</p>
-              <p className="text-sm">Terms: Payment due within 30 days. Cancellation charges apply as per policy.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left side - Thank you message */}
+              <div className="text-gray-600">
+                <p className="font-medium mb-2">Thank you for choosing {companyName}!</p>
+                <p className="text-sm mb-4">We hope you have a wonderful and memorable journey!</p>
+                <div className="text-sm">
+                  <p className="font-medium mb-2">For Your Future Travel Plans, Contact Us:</p>
+                  <p>Phone: {companyDetails.phone || '+91-9876543210'} | Email: {companyDetails.email || 'info@travelbillpro.com'}</p>
+                  <p>Website: {companyDetails.website || 'www.travelbillpro.com'} | {companyDetails.address || 'Mumbai, Maharashtra'}</p>
+                </div>
+              </div>
+              
+              {/* Right side - Payment Details */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-800 mb-3 text-center">PAYMENT DETAILS</h4>
+                <div className="text-sm text-gray-700 space-y-1">
+                  <p>Bank: HDFC Bank</p>
+                  <p>A/c: 50200095881711</p>
+                  <p>IFSC: HDFC0001913</p>
+                  <p>Holder: TRAVERSE GLOBE</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

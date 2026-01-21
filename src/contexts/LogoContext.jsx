@@ -22,7 +22,8 @@ export const LogoProvider = ({ children }) => {
     bankName: 'State Bank of India',
     accountNumber: '1234567890',
     ifscCode: 'SBIN0001234',
-    accountHolder: 'Travel Bill Pro'
+    accountHolder: 'Travel Bill Pro',
+    upiId: 'travelbillpro@paytm'
   })
   const [logoSettings, setLogoSettings] = useState({
     showInPDF: true,
@@ -96,7 +97,8 @@ export const LogoProvider = ({ children }) => {
       bankName: 'State Bank of India',
       accountNumber: '1234567890',
       ifscCode: 'SBIN0001234',
-      accountHolder: 'Travel Bill Pro'
+      accountHolder: 'Travel Bill Pro',
+      upiId: 'travelbillpro@paytm'
     }
     setCompanyDetails(defaultDetails)
     localStorage.setItem('travel-bill-company-details', JSON.stringify(defaultDetails))
