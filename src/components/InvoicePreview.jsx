@@ -26,14 +26,14 @@ const InvoicePreview = ({ invoice }) => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800">Invoice Preview</h2>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h2 className="text-lg md:text-xl font-semibold text-gray-800">Invoice Preview</h2>
         <button
           onClick={exportToPDF}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm md:text-base"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           Export PDF
@@ -42,11 +42,11 @@ const InvoicePreview = ({ invoice }) => {
 
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
         {/* Invoice Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-            <div className="flex items-center gap-4">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 md:p-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               {(invoice.showLogo !== false) && (
-                <div className="w-12 h-12 bg-white rounded-lg p-2 flex items-center justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-lg p-2 flex items-center justify-center">
                   <img 
                     src={currentLogo} 
                     alt="Company Logo" 
@@ -55,24 +55,24 @@ const InvoicePreview = ({ invoice }) => {
                 </div>
               )}
               <div>
-                <h1 className="text-3xl font-bold mb-2">{companyName.toUpperCase()}</h1>
-                <p className="text-blue-100">{companyDetails.tagline || 'Your Ultimate Solution for Professional Travel Billing'}</p>
-                <div className="text-sm text-blue-100 mt-2 space-y-1">
+                <h1 className="text-xl md:text-3xl font-bold mb-2">{companyName.toUpperCase()}</h1>
+                <p className="text-blue-100 text-sm md:text-base">{companyDetails.tagline || 'Your Ultimate Solution for Professional Travel Billing'}</p>
+                <div className="text-xs md:text-sm text-blue-100 mt-2 space-y-1">
                   <p>Email: {companyDetails.email || 'info@travelbillpro.com'}</p>
                   <p>Phone: {companyDetails.phone || '+91-9876543210'}</p>
                   <p>{companyDetails.address || 'Mumbai, Maharashtra 400001'}</p>
                 </div>
               </div>
             </div>
-            <div className="mt-4 md:mt-0 text-right">
-              <h2 className="text-2xl font-bold">INVOICE</h2>
+            <div className="mt-4 md:mt-0 text-left md:text-right">
+              <h2 className="text-xl md:text-2xl font-bold">INVOICE</h2>
               <p className="text-blue-100">#{invoice.invoiceNumber}</p>
               <p className="text-blue-100">{new Date(invoice.date).toLocaleDateString('en-IN')}</p>
             </div>
           </div>
         </div>
 
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           {/* Customer & Travel Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
@@ -98,25 +98,25 @@ const InvoicePreview = ({ invoice }) => {
           </div>
 
           {/* Items Table */}
-          <div className="overflow-x-auto mb-8">
-            <table className="w-full">
+          <div className="overflow-x-auto mb-6 md:mb-8">
+            <table className="w-full min-w-[500px]">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left py-4 px-4 font-semibold text-gray-800">Particulars</th>
-                  <th className="text-center py-4 px-4 font-semibold text-gray-800">Travelers</th>
-                  <th className="text-right py-4 px-4 font-semibold text-gray-800">Price per Person</th>
-                  <th className="text-right py-4 px-4 font-semibold text-gray-800">Total</th>
+                  <th className="text-left py-3 md:py-4 px-2 md:px-4 font-semibold text-gray-800 text-sm md:text-base">Particulars</th>
+                  <th className="text-center py-3 md:py-4 px-2 md:px-4 font-semibold text-gray-800 text-sm md:text-base">Travelers</th>
+                  <th className="text-right py-3 md:py-4 px-2 md:px-4 font-semibold text-gray-800 text-sm md:text-base">Price per Person</th>
+                  <th className="text-right py-3 md:py-4 px-2 md:px-4 font-semibold text-gray-800 text-sm md:text-base">Total</th>
                 </tr>
               </thead>
               <tbody>
                 {invoice.items.map((item, index) => (
                   <tr key={index} className="border-b border-gray-100">
-                    <td className="py-4 px-4">
-                      <div className="font-medium text-gray-900">{item.tourName || 'Tour Package'}</div>
+                    <td className="py-3 md:py-4 px-2 md:px-4">
+                      <div className="font-medium text-gray-900 text-sm md:text-base">{item.tourName || 'Tour Package'}</div>
                     </td>
-                    <td className="text-center py-4 px-4 text-gray-700">{item.qty}</td>
-                    <td className="text-right py-4 px-4 text-gray-700">₹{item.price.toLocaleString()}</td>
-                    <td className="text-right py-4 px-4 font-medium text-gray-900">₹{(item.qty * item.price).toLocaleString()}</td>
+                    <td className="text-center py-3 md:py-4 px-2 md:px-4 text-gray-700 text-sm md:text-base">{item.qty}</td>
+                    <td className="text-right py-3 md:py-4 px-2 md:px-4 text-gray-700 text-sm md:text-base">₹{item.price.toLocaleString()}</td>
+                    <td className="text-right py-3 md:py-4 px-2 md:px-4 font-medium text-gray-900 text-sm md:text-base">₹{(item.qty * item.price).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -124,9 +124,9 @@ const InvoicePreview = ({ invoice }) => {
           </div>
 
           {/* Billing Summary */}
-          <div className="mb-8">
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 max-w-md">
-              <h3 className="font-semibold text-gray-800 mb-4 text-center">BILLING SUMMARY</h3>
+          <div className="mb-6 md:mb-8">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-6 max-w-full md:max-w-md">
+              <h3 className="font-semibold text-gray-800 mb-4 text-center text-sm md:text-base">BILLING SUMMARY</h3>
               <div className="space-y-2">
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal:</span>

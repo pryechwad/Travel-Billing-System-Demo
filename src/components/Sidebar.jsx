@@ -69,8 +69,8 @@ const Sidebar = ({ currentView, setCurrentView, isOpen, setIsOpen }) => {
       
       {/* Sidebar */}
       <div className={`fixed left-0 top-0 h-full bg-white shadow-lg transition-all duration-300 z-50 ${
-        isOpen ? 'w-64' : 'w-16 md:w-16 -translate-x-full md:translate-x-0'
-      } ${isOpen ? 'translate-x-0' : ''}`}>
+        isOpen ? 'w-64 translate-x-0' : 'w-64 -translate-x-full md:w-16 md:translate-x-0'
+      }`}>
       {/* Logo */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center gap-3">
@@ -93,7 +93,13 @@ const Sidebar = ({ currentView, setCurrentView, isOpen, setIsOpen }) => {
           {menuItems.map((item) => (
             <li key={item.id}>
               <button
-                onClick={() => setCurrentView(item.id)}
+                onClick={() => {
+                  setCurrentView(item.id)
+                  // Close sidebar on mobile after selection
+                  if (window.innerWidth < 768) {
+                    setIsOpen(false)
+                  }
+                }}
                 className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${
                   currentView === item.id
                     ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'

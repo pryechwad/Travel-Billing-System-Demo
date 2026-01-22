@@ -37,22 +37,30 @@ function App() {
 function AppContent() {
   const [currentView, setCurrentView] = useState('dashboard')
   const [currentInvoice, setCurrentInvoice] = useState(createInitialInvoice)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Start closed on mobile
 
   const resetInvoice = () => {
     setCurrentInvoice(createInitialInvoice())
   }
 
+  // Close sidebar when view changes on mobile
+  const handleViewChange = (view) => {
+    setCurrentView(view)
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false)
+    }
+  }
+
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard onCreateInvoice={() => setCurrentView('create-invoice')} />
+        return <Dashboard onCreateInvoice={() => handleViewChange('create-invoice')} />
       case 'create-invoice':
         return (
           <InvoiceForm 
             invoice={currentInvoice}
             setInvoice={setCurrentInvoice}
-            onBack={() => setCurrentView('dashboard')}
+            onBack={() => handleViewChange('dashboard')}
           />
         )
       case 'preview-invoice':
@@ -64,29 +72,29 @@ function AppContent() {
       case 'company-settings':
         return <CompanySettings />
       default:
-        return <Dashboard onCreateInvoice={() => setCurrentView('create-invoice')} />
+        return <Dashboard onCreateInvoice={() => handleViewChange('create-invoice')} />
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex relative">
       <Sidebar 
         currentView={currentView}
-        setCurrentView={setCurrentView}
+        setCurrentView={handleViewChange}
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
       />
       
-      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-16'}`}>
+      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-16'} w-full`}>
         <Header 
           currentView={currentView}
-          setCurrentView={setCurrentView}
+          setCurrentView={handleViewChange}
           invoice={currentInvoice}
           resetInvoice={resetInvoice}
           toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
         
-        <main className="p-6 min-h-screen">
+        <main className="p-4 md:p-6 min-h-screen">
           {renderContent()}
         </main>
       </div>
