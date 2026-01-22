@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { storage } from '../utils/storage'
 import ResponsiveLogo from './ResponsiveLogo'
 import { useNotification } from './Notification'
+import { useLogo } from '../contexts/LogoContext'
 
 const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
   const [isSaving, setIsSaving] = useState(false)
   const { showNotification, NotificationComponent } = useNotification()
+  const { companyName } = useLogo()
 
   const saveInvoice = async () => {
     if (!invoice.customerName || !invoice.items[0]?.tourName) {
@@ -38,25 +40,10 @@ const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
       setIsSaving(false)
     }
   }
-  const tourPackages = [
-    'Dubai City Explorer - 3D/2N',
-    'Abu Dhabi Grand Tour - 4D/3N',
-    'Desert Safari Adventure - 2D/1N',
-    'Burj Khalifa & Dubai Mall Experience - 1D',
-    'Dubai Marina & JBR Beach - 2D/1N',
-    'Al Ain Oasis & Jebel Hafeet - 2D/1N',
-    'Sharjah Cultural Heritage - 1D',
-    'Fujairah Mountains & Beaches - 3D/2N',
-    'Ras Al Khaimah Adventure - 2D/1N',
-    'Dubai Miracle Garden & Global Village - 1D',
-    'Atlantis Aquaventure & Lost Chambers - 1D',
-    'Dubai Creek & Old Souk Tour - 1D'
-  ]
-
   const addItem = () => {
     setInvoice(prev => ({
       ...prev,
-      items: [...prev.items, { tourName: '', qty: 1, price: 0, duration: '', destination: '' }]
+      items: [...prev.items, { tourName: '', qty: 1, price: 0, duration: '', destination: '', hsnSac: '996311' }]
     }))
   }
 
@@ -92,7 +79,7 @@ const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <ResponsiveLogo size="medium" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Travel Bill Pro</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{companyName}</h1>
             </div>
             <p className="text-gray-600">Create New Invoice - #{invoice.invoiceNumber}</p>
           </div>
@@ -156,34 +143,41 @@ const InvoiceForm = ({ invoice, setInvoice, onBack }) => {
           </div>
         </div>
 
-        {/* Tour Packages */}
+        {/* Particulars */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-800">Tour Packages</h2>
+            <h2 className="text-lg font-semibold text-gray-800">Particulars</h2>
             <button
               onClick={addItem}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
-              + Add Package
+              + Add Item
             </button>
           </div>
           
           <div className="space-y-4">
             {invoice.items.map((item, index) => (
               <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                   <div className="lg:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tour Package</label>
-                    <select
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Particulars</label>
+                    <input
+                      type="text"
+                      placeholder="Enter particulars/description"
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value={item.tourName}
                       onChange={(e) => updateItem(index, 'tourName', e.target.value)}
-                    >
-                      <option value="">Select tour package</option>
-                      {tourPackages.map((pkg, i) => (
-                        <option key={i} value={pkg}>{pkg}</option>
-                      ))}
-                    </select>
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">HSN/SAC Code</label>
+                    <input
+                      type="text"
+                      placeholder="996311"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={item.hsnSac || ''}
+                      onChange={(e) => updateItem(index, 'hsnSac', e.target.value)}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Travelers</label>

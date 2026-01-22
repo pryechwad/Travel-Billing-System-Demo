@@ -102,7 +102,7 @@ const InvoicePreview = ({ invoice }) => {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left py-4 px-4 font-semibold text-gray-800">Tour Package</th>
+                  <th className="text-left py-4 px-4 font-semibold text-gray-800">Particulars</th>
                   <th className="text-center py-4 px-4 font-semibold text-gray-800">Travelers</th>
                   <th className="text-right py-4 px-4 font-semibold text-gray-800">Price per Person</th>
                   <th className="text-right py-4 px-4 font-semibold text-gray-800">Total</th>

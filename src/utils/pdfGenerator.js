@@ -1,386 +1,316 @@
 import jsPDF from 'jspdf'
-import { defaultLogo } from './defaultLogo'
 
-export const generateInvoicePDF = (invoice, customLogo = null, companyName = 'Travel Bill Pro', companyDetails = {}) => {
+export const generateInvoicePDF = (invoice, logo = null, companyName = 'Travel Bill Pro', companyDetails = {}) => {
   const pdf = new jsPDF()
   
-  console.log('PDF Generator - Company Name:', companyName)
-  console.log('PDF Generator - Company Details Keys:', Object.keys(companyDetails))
-  console.log('PDF Generator - GSTIN:', companyDetails.gstin)
-  console.log('PDF Generator - Phone:', companyDetails.phone)
-  console.log('PDF Generator - Email:', companyDetails.email)
+  // Get company details with fallbacks
+  const company = {
+    name: companyName || 'TRAVEL BILL PRO',
+    address: companyDetails.address || 'Mumbai, Maharashtra 400001',
+    gstin: companyDetails.gstin || '27ABCDE1234F1Z5',
+    email: companyDetails.email || 'info@travelbillpro.com',
+    website: companyDetails.website || 'www.travelbillpro.com',
+    phone: companyDetails.phone || '+91-9876543210',
+    placeOfSupply: companyDetails.placeOfSupply || 'Maharashtra (27)',
+    bankName: companyDetails.bankName || 'HDFC Bank',
+    accountHolder: companyDetails.accountHolder || companyName || 'TRAVEL BILL PRO',
+    accountNumber: companyDetails.accountNumber || '50200095881711',
+    ifscCode: companyDetails.ifscCode || 'HDFC0001913'
+  }
   
-  // Header with proper border
+  // Main border - thin line
   pdf.setDrawColor(0, 0, 0)
-  pdf.setLineWidth(1)
-  pdf.rect(10, 5, 190, 50)
+  pdf.setLineWidth(0.3)
+  pdf.rect(10, 10, 190, 277)
   
-  // Company Logo - Large size (40x40)
-  if (invoice.showLogo !== false) {
-    const logoToUse = customLogo || defaultLogo
-    console.log('Adding logo to PDF:', { logoToUse: logoToUse.substring(0, 50) })
-    
+  // Logo on left side - 60x60 size, properly centered
+  if (logo) {
     try {
-      if (logoToUse.includes('data:image/svg')) {
-        console.log('Skipping SVG logo due to jsPDF compatibility')
-        pdf.setFillColor(41, 128, 185)
-        pdf.circle(35, 30, 18, 'F')
-        pdf.setFontSize(16)
-        pdf.setFont('helvetica', 'bold')
-        pdf.setTextColor(255, 255, 255)
-        pdf.text('TBP', 28, 34)
-      } else if (logoToUse.includes('data:image/png')) {
-        pdf.addImage(logoToUse, 'PNG', 15, 10, 40, 40)
-      } else if (logoToUse.includes('data:image/jpeg') || logoToUse.includes('data:image/jpg')) {
-        pdf.addImage(logoToUse, 'JPEG', 15, 10, 40, 40)
-      } else {
-        pdf.setFillColor(41, 128, 185)
-        pdf.circle(35, 30, 18, 'F')
-        pdf.setFontSize(16)
-        pdf.setFont('helvetica', 'bold')
-        pdf.setTextColor(255, 255, 255)
-        pdf.text('TBP', 28, 34)
-      }
+      pdf.addImage(logo, 'JPEG', 15, 12, 60, 60)
     } catch (error) {
-      console.warn('Could not add logo to PDF:', error)
-      pdf.setFillColor(41, 128, 185)
-      pdf.circle(35, 30, 18, 'F')
-      pdf.setFontSize(16)
-      pdf.setFont('helvetica', 'bold')
-      pdf.setTextColor(255, 255, 255)
-      pdf.text('TBP', 28, 34)
+      console.log('Logo error:', error)
     }
   }
   
-  // Company Details - Vertical layout as requested
-  pdf.setTextColor(0, 0, 0)
-  
-  // Company Name
-  pdf.setFontSize(22)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(companyName.toUpperCase(), 65, 15)
-  
-  // Tagline
-  pdf.setFontSize(9)
-  pdf.setFont('helvetica', 'italic')
-  const tagline = companyDetails.tagline || 'Your Ultimate Solution for Professional Travel Billing'
-  pdf.text(tagline, 65, 22)
-  
-  // Address
-  pdf.setFontSize(8)
-  pdf.setFont('helvetica', 'normal')
-  const address = companyDetails.address || 'Mumbai - 400001'
-  pdf.text(`Address: ${address}`, 65, 28)
-  
-  // Contact details on one line
-  const phone = companyDetails.phone || '+91-9876543210'
-  const email = companyDetails.email || 'info@travelbillpro.com'
-  pdf.text(`Ph: ${phone} | Email: ${email.substring(0, 25)}`, 65, 33)
-  
-  // GSTIN
-  const gstin = companyDetails.gstin || '27ABCDE1234F1Z5'
-  pdf.text(`GSTIN: ${gstin}`, 65, 38)
-  
-  // Receipt Title
+  // Company name - positioned next to logo with adjusted spacing
   pdf.setFontSize(16)
   pdf.setFont('helvetica', 'bold')
-  pdf.setTextColor(0, 0, 0)
-  pdf.text('TRAVEL RECEIPT', 80, 60)
+  pdf.text(company.name, logo ? 80 : 15, 25)
   
-  // Main border
-  pdf.setDrawColor(0, 0, 0)
-  pdf.setLineWidth(1)
-  pdf.rect(10, 65, 190, 210)
-  
-  // Receipt Info Table
-  let yPos = 75
-  pdf.setDrawColor(0, 0, 0)
-  pdf.setLineWidth(0.5)
-  pdf.rect(15, yPos, 180, 20)
-  pdf.line(105, yPos, 105, yPos + 20)
-  pdf.line(15, yPos + 10, 195, yPos + 10)
-  
-  pdf.setFontSize(9)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text('Receipt No:', 20, yPos + 7)
-  pdf.text('Date:', 20, yPos + 17)
-  pdf.text('Travel Date:', 110, yPos + 7)
-  pdf.text('Payment Mode:', 110, yPos + 17)
-  
+  // Company details - positioned under company name with adjusted spacing
+  pdf.setFontSize(8)
   pdf.setFont('helvetica', 'normal')
-  pdf.text(invoice.invoiceNumber || 'TBP123456', 50, yPos + 7)
-  pdf.text(new Date(invoice.date || new Date()).toLocaleDateString('en-IN'), 35, yPos + 17)
-  pdf.text(new Date(invoice.travelDate || new Date()).toLocaleDateString('en-IN'), 145, yPos + 7)
-  pdf.text((invoice.paymentMode || 'CASH').toUpperCase(), 150, yPos + 17)
+  let detailsX = logo ? 80 : 15
+  pdf.text(company.address, detailsX, 32)
+  pdf.text(`GSTIN: ${company.gstin}`, detailsX, 38)
+  pdf.text(`Email: ${company.email}`, detailsX, 44)
+  pdf.text(`Phone: ${company.phone}`, detailsX, 50)
   
-  // Customer Details
-  yPos = 85
-  pdf.rect(15, yPos, 180, 25)
-  pdf.setFillColor(240, 240, 240)
-  pdf.rect(15, yPos, 180, 6, 'F')
-  
-  pdf.setFontSize(10)
+  // TAX INVOICE title - positioned on right
+  pdf.setFontSize(18)
   pdf.setFont('helvetica', 'bold')
-  pdf.setTextColor(0, 0, 0)
-  pdf.text('CUSTOMER DETAILS', 90, yPos + 4)
+  pdf.text('TAX INVOICE', 190, 35, { align: 'right' })
   
-  pdf.setFontSize(9)
+  // Invoice details table - thin borders
+  let yPos = 60
+  pdf.setLineWidth(0.2)
+  
+  // Create one big box for all invoice details
+  pdf.rect(10, yPos, 95, 26)
+  pdf.rect(105, yPos, 95, 26)
+  
+  pdf.setFontSize(8)
   pdf.setFont('helvetica', 'normal')
-  pdf.text(`Name: ${invoice.customerName || 'Customer Name'}`, 20, yPos + 12)
-  pdf.text(`Phone: ${invoice.customerPhone || '+91-9876543210'}`, 20, yPos + 18)
-  pdf.text(`Email: ${invoice.customerEmail || 'customer@email.com'}`, 110, yPos + 12)
-  pdf.text(`Address: ${invoice.customerAddress || 'Customer Address'}`, 20, yPos + 24)
-  // Services Table Header
-  yPos = 115
-  pdf.setFillColor(0, 0, 0)
-  pdf.rect(15, yPos, 180, 8, 'F')
+  
+  // Row 1: # and Place of Supply
+  pdf.text('#', 12, yPos + 5)
+  pdf.text(`: ${invoice.invoiceNumber || 'TG-INV/25-26/010'}`, 60, yPos + 5)
+  pdf.text('Place Of Supply', 107, yPos + 5)
+  pdf.text(`: ${company.placeOfSupply}`, 160, yPos + 5)
+  
+  // Row 2: Invoice Date (reduced spacing)
+  yPos += 6
+  pdf.text('Invoice Date', 12, yPos + 5)
+  pdf.text(`: ${new Date(invoice.date).toLocaleDateString('en-GB')}`, 60, yPos + 5)
+  
+  // Row 3: Terms (reduced spacing)
+  yPos += 6
+  pdf.text('Terms', 12, yPos + 5)
+  pdf.text(': Due on Receipt', 60, yPos + 5)
+  
+  // Row 4: Due Date (reduced spacing)
+  yPos += 6
+  pdf.text('Due Date', 12, yPos + 5)
+  pdf.text(`: ${new Date(invoice.dueDate || invoice.date).toLocaleDateString('en-GB')}`, 60, yPos + 5)
+  
+  // Bill To and Ship To
+  yPos += 12
+  pdf.rect(10, yPos, 95, 8)
+  pdf.rect(105, yPos, 95, 8)
   pdf.setFont('helvetica', 'bold')
-  pdf.setTextColor(255, 255, 255)
-  pdf.text('S.No', 20, yPos + 5)
-  pdf.text('Tour Package Details', 50, yPos + 5)
-  pdf.text('No. of Travelers', 115, yPos + 5)
-  pdf.text('Rate', 150, yPos + 5)
-  pdf.text('Total', 175, yPos + 5)
+  pdf.text('Bill To', 12, yPos + 5)
+  pdf.text('Ship To', 107, yPos + 5)
   
-  // Table column lines
-  pdf.setDrawColor(0, 0, 0)
-  pdf.setLineWidth(0.5)
-  pdf.line(15, yPos, 15, yPos + 8)
-  pdf.line(35, yPos, 35, yPos + 8)
-  pdf.line(125, yPos, 125, yPos + 8)
-  pdf.line(145, yPos, 145, yPos + 8)
-  pdf.line(170, yPos, 170, yPos + 8)
-  pdf.line(195, yPos, 195, yPos + 8)
-  
-  // Items Data
+  // Customer details - properly formatted
   yPos += 8
+  pdf.rect(10, yPos, 95, 24)
+  pdf.rect(105, yPos, 95, 24)
   pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(0, 0, 0)
-  let subtotal = 0
   
+  // Format customer details for Bill To
+  const customerName = invoice.customerName || 'Customer Name'
+  const customerEmail = invoice.customerEmail || ''
+  const customerPhone = invoice.customerPhone || ''
+  const customerAddress = invoice.customerAddress || 'Address'
+  
+  // Bill To section
+  let billToY = yPos + 6
+  pdf.text(customerName, 12, billToY)
+  billToY += 4
+  
+  if (customerEmail) {
+    pdf.text(customerEmail, 12, billToY)
+    billToY += 4
+  }
+  
+  if (customerPhone) {
+    pdf.text(customerPhone, 12, billToY)
+    billToY += 4
+  }
+  
+  // Handle multi-line address
+  const addressLines = customerAddress.split('\n')
+  addressLines.forEach(line => {
+    if (line.trim() && billToY < yPos + 22) {
+      pdf.text(line.trim(), 12, billToY)
+      billToY += 4
+    }
+  })
+  
+  // Ship To section (same as Bill To)
+  let shipToY = yPos + 6
+  pdf.text(customerName, 107, shipToY)
+  shipToY += 4
+  
+  if (customerEmail) {
+    pdf.text(customerEmail, 107, shipToY)
+    shipToY += 4
+  }
+  
+  if (customerPhone) {
+    pdf.text(customerPhone, 107, shipToY)
+    shipToY += 4
+  }
+  
+  // Handle multi-line address for Ship To
+  addressLines.forEach(line => {
+    if (line.trim() && shipToY < yPos + 22) {
+      pdf.text(line.trim(), 107, shipToY)
+      shipToY += 4
+    }
+  })
+  
+  // Items table - thin borders and alternating row colors
+  yPos += 28
+  
+  // Table header with light gray background
+  pdf.setFillColor(240, 240, 240)
+  pdf.rect(10, yPos, 15, 12, 'F')
+  pdf.rect(25, yPos, 60, 12, 'F')
+  pdf.rect(85, yPos, 25, 12, 'F')
+  pdf.rect(110, yPos, 15, 12, 'F')
+  pdf.rect(125, yPos, 25, 12, 'F')
+  pdf.rect(150, yPos, 25, 6, 'F')
+  pdf.rect(175, yPos, 25, 12, 'F')
+  pdf.rect(150, yPos + 6, 12, 6, 'F')
+  pdf.rect(162, yPos + 6, 13, 6, 'F')
+  
+  // Table borders
+  pdf.setLineWidth(0.2)
+  pdf.rect(10, yPos, 15, 12)
+  pdf.rect(25, yPos, 60, 12)
+  pdf.rect(85, yPos, 25, 12)
+  pdf.rect(110, yPos, 15, 12)
+  pdf.rect(125, yPos, 25, 12)
+  pdf.rect(150, yPos, 25, 6)
+  pdf.rect(175, yPos, 25, 12)
+  pdf.rect(150, yPos + 6, 12, 6)
+  pdf.rect(162, yPos + 6, 13, 6)
+  
+  pdf.setFont('helvetica', 'bold')
+  pdf.setFontSize(7)
+  pdf.text('#', 17, yPos + 6, { align: 'center' })
+  pdf.text('Item & Description', 55, yPos + 6, { align: 'center' })
+  pdf.text('HSN/SAC', 97, yPos + 6, { align: 'center' })
+  pdf.text('Qty', 117, yPos + 6, { align: 'center' })
+  pdf.text('Rate', 137, yPos + 6, { align: 'center' })
+  pdf.text('IGST', 162, yPos + 3, { align: 'center' })
+  pdf.text('%', 156, yPos + 9, { align: 'center' })
+  pdf.text('Amt', 168, yPos + 9, { align: 'center' })
+  pdf.text('Amount', 187, yPos + 6, { align: 'center' })
+  
+  // Items data with alternating row colors
+  yPos += 12
+  let subtotal = 0
   invoice.items.forEach((item, index) => {
     const total = item.qty * item.price
     subtotal += total
     
-    // Row
-    pdf.rect(15, yPos, 180, 10)
-    pdf.line(35, yPos, 35, yPos + 10)
-    pdf.line(125, yPos, 125, yPos + 10)
-    pdf.line(145, yPos, 145, yPos + 10)
-    pdf.line(170, yPos, 170, yPos + 10)
+    // Alternating row background
+    if (index % 2 === 1) {
+      pdf.setFillColor(248, 248, 248)
+      pdf.rect(10, yPos, 190, 12, 'F')
+    }
     
-    pdf.text((index + 1).toString(), 22, yPos + 6)
-    pdf.text(item.tourName || 'Tour Package', 40, yPos + 6)
-    pdf.text((item.qty || 1).toString(), 132, yPos + 6)
-    pdf.text(`Rs.${(item.price || 0).toLocaleString()}`, 148, yPos + 6)
-    pdf.text(`Rs.${total.toLocaleString()}`, 175, yPos + 6)
-    yPos += 10
+    // Thin borders
+    pdf.setLineWidth(0.2)
+    pdf.rect(10, yPos, 15, 12)
+    pdf.rect(25, yPos, 60, 12)
+    pdf.rect(85, yPos, 25, 12)
+    pdf.rect(110, yPos, 15, 12)
+    pdf.rect(125, yPos, 25, 12)
+    pdf.rect(150, yPos, 12, 12)
+    pdf.rect(162, yPos, 13, 12)
+    pdf.rect(175, yPos, 25, 12)
+    
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(8)
+    pdf.text((index + 1).toString(), 17, yPos + 7, { align: 'center' })
+    pdf.text(item.tourName || 'Goa Beach Paradise - 3D/2N', 27, yPos + 7)
+    pdf.text(item.hsnSac || '996311', 97, yPos + 7, { align: 'center' })
+    pdf.text(item.qty.toString(), 117, yPos + 7, { align: 'center' })
+    pdf.text(item.price.toLocaleString('en-IN'), 137, yPos + 7, { align: 'center' })
+    pdf.text('5%', 156, yPos + 7, { align: 'center' })
+    pdf.text((total * 0.05).toLocaleString('en-IN'), 168, yPos + 7, { align: 'center' })
+    pdf.text(total.toLocaleString('en-IN'), 187, yPos + 7, { align: 'center' })
+    
+    yPos += 12
   })
   
-  // Calculate totals
-  const discount = (subtotal * (invoice.discount || 0)) / 100
-  const taxableAmount = subtotal - discount
-  const tax = (taxableAmount * (invoice.taxRate || 18)) / 100
-  const totalAmount = taxableAmount + tax
-  const advanceAmount = invoice.advanceAmount || 0
-  const pendingAmount = totalAmount - advanceAmount
+  // Summary section with thin borders
+  const discount = (subtotal * (invoice.discount || 5)) / 100
+  const igst = subtotal * 0.05
+  const totalAmount = subtotal + igst - discount
+  const balanceDue = totalAmount - (invoice.advanceAmount || 0)
   
-  // Billing Summary Section
-  yPos += 10
-  
-  // Billing Summary Box
-  pdf.rect(20, yPos, 90, 40)
-  pdf.setFillColor(240, 240, 240)
-  pdf.rect(20, yPos, 90, 6, 'F')
-  
-  pdf.setFont('helvetica', 'bold')
-  pdf.setFontSize(10)
-  pdf.text('BILLING SUMMARY', 50, yPos + 4)
-  
-  let summaryYPos = yPos + 12
-  pdf.setFont('helvetica', 'normal')
-  pdf.setFontSize(9)
-  pdf.text('Subtotal:', 25, summaryYPos)
-  pdf.text(`Rs.${subtotal.toLocaleString()}`, 80, summaryYPos)
-  
-  if (invoice.discount > 0) {
-    summaryYPos += 5
-    pdf.text(`Discount (${invoice.discount}%):`, 25, summaryYPos)
-    pdf.text(`-Rs.${discount.toLocaleString()}`, 80, summaryYPos)
-  }
-  
-  summaryYPos += 5
-  pdf.text(`CGST (${(invoice.taxRate || 18)/2}%):`, 25, summaryYPos)
-  pdf.text(`Rs.${Math.round(tax/2).toLocaleString()}`, 80, summaryYPos)
-  
-  summaryYPos += 5
-  pdf.text(`SGST (${(invoice.taxRate || 18)/2}%):`, 25, summaryYPos)
-  pdf.text(`Rs.${Math.round(tax/2).toLocaleString()}`, 80, summaryYPos)
-  
-  summaryYPos += 8
-  pdf.setFont('helvetica', 'bold')
-  pdf.setFillColor(0, 0, 0)
-  pdf.rect(20, summaryYPos - 2, 90, 6, 'F')
-  pdf.setTextColor(255, 255, 255)
-  pdf.text('TOTAL AMOUNT:', 25, summaryYPos + 2)
-  pdf.text(`Rs.${Math.round(totalAmount).toLocaleString()}`, 80, summaryYPos + 2)
-  pdf.setTextColor(0, 0, 0)
-  
-  // Payment Breakdown Table (Full width)
-  yPos += 50
-  
-  // Payment Breakdown Header
-  pdf.rect(20, yPos, 155, 8)
-  pdf.setFillColor(240, 240, 240)
-  pdf.rect(20, yPos, 155, 8, 'F')
-  
-  pdf.setFont('helvetica', 'bold')
-  pdf.setFontSize(10)
-  pdf.text('PAYMENT BREAKDOWN', 90, yPos + 5)
-  
-  // Table Header Row
-  yPos += 8
-  pdf.rect(20, yPos, 155, 8)
-  pdf.setFillColor(220, 220, 220)
-  pdf.rect(20, yPos, 155, 8, 'F')
-  
-  pdf.setFontSize(9)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text('Description', 25, yPos + 5)
-  pdf.text('Amount (Rs.)', 90, yPos + 5)
-  pdf.text('Date', 140, yPos + 5)
-  
-  // Table lines
-  pdf.line(20, yPos, 175, yPos)
-  pdf.line(85, yPos, 85, yPos + 8)
-  pdf.line(135, yPos, 135, yPos + 8)
-  
-  // Advance Amount Row (if exists)
-  yPos += 8
-  if (advanceAmount > 0) {
-    pdf.rect(20, yPos, 155, 6)
-    pdf.setFont('helvetica', 'normal')
-    pdf.text('Advance Amount', 25, yPos + 4)
-    pdf.text(advanceAmount.toLocaleString(), 90, yPos + 4)
-    pdf.text(new Date(invoice.date).toLocaleDateString('en-IN'), 140, yPos + 4)
-    
-    pdf.line(85, yPos, 85, yPos + 6)
-    pdf.line(135, yPos, 135, yPos + 6)
-    yPos += 6
-  }
-  
-  // Pending Amount Row
-  pdf.rect(20, yPos, 155, 6)
-  pdf.setFont('helvetica', 'normal')
-  pdf.text('Pending Amount', 25, yPos + 4)
-  pdf.text(Math.round(pendingAmount).toLocaleString(), 90, yPos + 4)
-  pdf.text(invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-IN') : '-', 140, yPos + 4)
-  
-  pdf.line(85, yPos, 85, yPos + 6)
-  pdf.line(135, yPos, 135, yPos + 6)
-  yPos += 6
-  
-  // Total Amount Row
-  pdf.rect(20, yPos, 155, 6)
-  pdf.setFillColor(240, 240, 240)
-  pdf.rect(20, yPos, 155, 6, 'F')
-  pdf.setFont('helvetica', 'bold')
-  pdf.text('Total Amount', 25, yPos + 4)
-  pdf.text(Math.round(totalAmount).toLocaleString(), 90, yPos + 4)
-  pdf.text('-', 140, yPos + 4)
-  
-  pdf.line(85, yPos, 85, yPos + 6)
-  pdf.line(135, yPos, 135, yPos + 6)
-  
-  // Payment Details Box (Right side of payment breakdown)
-  yPos += 15
-  pdf.rect(120, yPos, 75, 25)
-  pdf.setFillColor(240, 240, 240)
-  pdf.rect(120, yPos, 75, 6, 'F')
-  
-  pdf.setFont('helvetica', 'bold')
-  pdf.setFontSize(9)
-  pdf.text('PAYMENT DETAILS', 140, yPos + 4)
-  
-  let paymentYPos = yPos + 10
-  pdf.setFont('helvetica', 'normal')
-  pdf.setFontSize(7)
-  
-  // HDFC Bank Details
-  pdf.text('Bank: HDFC Bank', 125, paymentYPos)
-  paymentYPos += 3
-  pdf.text('A/c: 50200095881711', 125, paymentYPos)
-  paymentYPos += 3
-  pdf.text('IFSC: HDFC0001913', 125, paymentYPos)
-  paymentYPos += 3
-  pdf.text('Holder: TRAVERSE GLOBE', 125, paymentYPos)
-  
-  pdf.setFontSize(9)
-  
-  // Amount in Words
-  yPos += 50
-  pdf.setFont('helvetica', 'bold')
-  pdf.text('Amount in Words:', 20, yPos)
-  pdf.setFont('helvetica', 'normal')
-  pdf.text(`${convertToWords(Math.round(totalAmount))} Rupees Only`, 20, yPos + 6)
-  
-  // Thank You Message - Directly below amount in words
-  yPos += 15
-  pdf.setFontSize(8)
-  pdf.setFont('helvetica', 'bold')
-  pdf.setTextColor(0, 0, 0)
-  pdf.text(`Thank You for Choosing ${companyName}!`, 20, yPos)
-  
-  pdf.setFontSize(7)
-  pdf.setFont('helvetica', 'normal')
-  pdf.text('We hope you have a wonderful and memorable journey!', 20, yPos + 6)
-  
-  // Signature Section - Smaller Box
-  yPos += 15
-  pdf.rect(140, yPos, 55, 15)
-  
+  // Sub Total
+  pdf.setLineWidth(0.2)
+  pdf.rect(150, yPos, 25, 8)
+  pdf.rect(175, yPos, 25, 8)
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(8)
-  pdf.text('Authorized Signatory', 145, yPos + 12)
+  pdf.text('Sub Total', 162, yPos + 5, { align: 'center' })
+  pdf.text(subtotal.toLocaleString('en-IN'), 187, yPos + 5, { align: 'center' })
   
-  pdf.setFontSize(7)
-  pdf.setTextColor(0, 0, 0)
-  pdf.text(`Digitally Signed by ${companyName}`, 142, yPos + 4)
-  pdf.text(new Date().toLocaleDateString('en-IN'), 150, yPos + 8)
+  // IGST5
+  yPos += 8
+  pdf.rect(150, yPos, 25, 8)
+  pdf.rect(175, yPos, 25, 8)
+  pdf.text('IGST5 (5%)', 162, yPos + 5, { align: 'center' })
+  pdf.text(igst.toLocaleString('en-IN'), 187, yPos + 5, { align: 'center' })
   
-  // Contact Details - Below thank you message
-  yPos += 4
-  pdf.setFontSize(7)
+  // Adjustment
+  yPos += 8
+  pdf.rect(150, yPos, 25, 8)
+  pdf.rect(175, yPos, 25, 8)
+  pdf.text('Adjustment', 162, yPos + 5, { align: 'center' })
+  pdf.text(discount > 0 ? `Rs.${discount.toFixed(2)}` : 'Rs.0.00', 187, yPos + 5, { align: 'center' })
+  
+  // Total
+  yPos += 8
+  pdf.rect(150, yPos, 25, 8)
+  pdf.rect(175, yPos, 25, 8)
+  pdf.text('Total', 162, yPos + 5, { align: 'center' })
+  pdf.text(`Rs.${totalAmount.toFixed(2)}`, 187, yPos + 5, { align: 'center' })
+  
+  // Balance Due with light gray background
+  yPos += 8
+  pdf.setFillColor(240, 240, 240)
+  pdf.rect(150, yPos, 50, 8, 'F')
+  pdf.rect(150, yPos, 50, 8)
+  pdf.text('Balance Due', 162, yPos + 5, { align: 'center' })
+  pdf.text(`Rs.${balanceDue.toFixed(2)}`, 187, yPos + 5, { align: 'center' })
+  
+  // Total In Words - positioned within border with proper spacing
+  yPos += 12
   pdf.setFont('helvetica', 'bold')
-  pdf.text('For Your Future Travel Plans, Contact Us:', 20, yPos)
+  pdf.setFontSize(8)
+  pdf.text('Total In Words:', 12, yPos)
+  pdf.setFont('helvetica', 'italic')
+  pdf.setFontSize(7)
+  pdf.text(`${convertToWords(Math.round(totalAmount))} Rupees Only`, 12, yPos + 5)
   
+  // Notes - positioned within border with proper spacing
+  yPos += 12
+  pdf.setFont('helvetica', 'bold')
+  pdf.setFontSize(8)
+  pdf.text('Notes', 12, yPos)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(7)
+  pdf.text('Thanks for your business.', 12, yPos + 5)
+  
+  // Terms & Bank Details - using company settings
+  yPos += 12
+  pdf.setFont('helvetica', 'bold')
+  pdf.setFontSize(8)
+  pdf.text('Terms & Conditions', 12, yPos)
+  pdf.text('Bank Details:', 12, yPos + 6)
   pdf.setFont('helvetica', 'normal')
   pdf.setFontSize(6)
+  pdf.text(`Bank Name: ${company.bankName}`, 12, yPos + 12)
+  pdf.text(`Account Holder: ${company.accountHolder}`, 12, yPos + 16)
+  pdf.text(`Account Number: ${company.accountNumber}`, 12, yPos + 20)
+  pdf.text(`IFSC: ${company.ifscCode}`, 12, yPos + 24)
+  pdf.text('Branch: SHAMLI', 12, yPos + 28)
+  pdf.text('MMID: 9240564', 12, yPos + 32)
+  pdf.text('Account Type: Current Account', 12, yPos + 36)
   
-  const contactPhone = companyDetails.phone || '+91-9876543210'
-  const contactEmail = companyDetails.email || 'info@travelbillpro.com'
-  const contactAddress = companyDetails.address || 'Mumbai, Maharashtra'
-  const contactWebsite = companyDetails.website || 'www.travelbillpro.com'
-  
-  pdf.text(`Phone: ${contactPhone} | Email: ${contactEmail}`, 20, yPos + 4)
-  pdf.text(`Website: ${contactWebsite} | ${contactAddress}`, 20, yPos + 7)
-  
-
-  
-
-  
-
-  
-  // Footer - Terms at bottom (Centered)
-  pdf.setFontSize(6)
-  pdf.setTextColor(100, 100, 100)
-  const termsText = 'This is a computer generated receipt. Terms & Conditions apply.'
-  const termsWidth = pdf.getTextWidth(termsText)
-  pdf.text(termsText, (210 - termsWidth) / 2, 270)
-  
-  const poweredText = `Powered by ${companyName}`
-  const poweredWidth = pdf.getTextWidth(poweredText)
-  pdf.text(poweredText, (210 - poweredWidth) / 2, 275)
+  // Authorized Signature box with thin border
+  pdf.setLineWidth(0.2)
+  pdf.rect(150, yPos + 20, 45, 25)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setFontSize(7)
+  pdf.text('Authorized Signature', 172, yPos + 40, { align: 'center' })
   
   return pdf
 }
@@ -399,19 +329,16 @@ const convertToWords = (num) => {
   return 'Amount too large'
 }
 
-export const downloadPDF = (invoice, customLogo = null, companyName = 'Travel Bill Pro', companyDetails = {}) => {
+export const downloadPDF = (invoice, logo = null, companyName = 'Travel Bill Pro', companyDetails = {}) => {
   try {
-    console.log('Generating PDF with logo:', {
-      hasCustomLogo: !!customLogo,
-      showLogo: invoice.showLogo,
-      logoType: customLogo ? customLogo.substring(0, 20) : 'none',
-      companyName,
-      companyDetails
-    })
-    const pdf = generateInvoicePDF(invoice, customLogo, companyName, companyDetails)
+    // Load company details from localStorage if not provided
+    const savedCompanyName = localStorage.getItem('travel-bill-company-name') || companyName
+    const savedCompanyDetails = localStorage.getItem('travel-bill-company-details')
+    const actualCompanyDetails = savedCompanyDetails ? JSON.parse(savedCompanyDetails) : companyDetails
+    
+    const pdf = generateInvoicePDF(invoice, logo, savedCompanyName, actualCompanyDetails)
     const timestamp = new Date().getTime()
-    pdf.save(`TravelBillPro_Receipt_${invoice.invoiceNumber}_${timestamp}.pdf`)
-    console.log('PDF generated successfully with logo support')
+    pdf.save(`${savedCompanyName.replace(/\s+/g, '')}_TaxInvoice_${invoice.invoiceNumber}_${timestamp}.pdf`)
   } catch (error) {
     console.error('Error generating PDF:', error)
     alert('Error generating PDF: ' + error.message)

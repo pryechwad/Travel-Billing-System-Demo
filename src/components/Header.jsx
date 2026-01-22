@@ -104,11 +104,11 @@ const Header = ({ currentView, setCurrentView, invoice, resetInvoice, toggleSide
           {/* User Profile */}
           <div className="flex items-center gap-2 md:gap-3 pl-2 md:pl-3 border-l border-gray-200">
             <div className="text-right hidden md:block">
-              <div className="text-sm font-medium text-gray-700">Travel Bill Pro</div>
+              <div className="text-sm font-medium text-gray-700">{companyName}</div>
               <div className="text-xs text-gray-500">Admin User</div>
             </div>
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">TBP</span>
+              <span className="text-white text-sm font-medium">{companyName.split(' ').map(word => word[0]).join('').substring(0, 3)}</span>
             </div>
           </div>
         </div>
@@ -139,7 +139,7 @@ const Header = ({ currentView, setCurrentView, invoice, resetInvoice, toggleSide
                 Total: ₹{invoice.items.reduce((sum, item) => sum + (item.qty * item.price), 0).toLocaleString()}
               </div>
               <div className="text-xs text-blue-600 mt-1">
-                Powered by Travel Bill Pro
+                Powered by {companyName}
               </div>
             </div>
           </div>

@@ -45,6 +45,14 @@ export const storage = {
     localStorage.setItem('traverse_invoices', JSON.stringify(filtered))
   },
 
+  updateInvoiceStatus: (id, status) => {
+    const invoices = storage.getInvoices()
+    const updatedInvoices = invoices.map(inv => 
+      inv.id === id ? { ...inv, status, updatedAt: new Date().toISOString() } : inv
+    )
+    localStorage.setItem('traverse_invoices', JSON.stringify(updatedInvoices))
+  },
+
   // Customers
   getCustomers: () => {
     const customers = localStorage.getItem('traverse_customers')

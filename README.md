@@ -106,7 +106,7 @@ npm run dev
 - Apply discounts and taxes
 - Set advance payments and due dates
 
-### PDF Receipt
+### PDF Tax Invoice
 - Professional company header
 - Customer details section
 - Itemized tour packages table

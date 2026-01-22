@@ -165,6 +165,26 @@ const CompanySettings = () => {
                 placeholder="www.yourcompany.com"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Place of Supply</label>
+              <input
+                type="text"
+                value={tempCompanyDetails.placeOfSupply || ''}
+                onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, placeOfSupply: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Maharashtra (27)"
+              />
+            </div>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Company Address</label>
+            <textarea
+              value={tempCompanyDetails.address || ''}
+              onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, address: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter complete company address"
+              rows="3"
+            />
           </div>
           <h4 className="text-md font-medium text-gray-800 mb-3">Payment Details</h4>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
