@@ -15,7 +15,8 @@ export const generateInvoicePDF = (invoice, logo = null, companyName = 'Travel B
     bankName: companyDetails.bankName || 'HDFC Bank',
     accountHolder: companyDetails.accountHolder || companyName || 'TRAVEL BILL PRO',
     accountNumber: companyDetails.accountNumber || '50200095881711',
-    ifscCode: companyDetails.ifscCode || 'HDFC0001913'
+    ifscCode: companyDetails.ifscCode || 'HDFC0001913',
+    branch: companyDetails.branch // No fallback - only show if user provided
   }
   
   // Main border - thin line
@@ -301,21 +302,25 @@ export const generateInvoicePDF = (invoice, logo = null, companyName = 'Travel B
   pdf.text(`Account Holder: ${company.accountHolder}`, 12, yPos + 16)
   pdf.text(`Account Number: ${company.accountNumber}`, 12, yPos + 20)
   pdf.text(`IFSC: ${company.ifscCode}`, 12, yPos + 24)
-  pdf.text('Branch: SHAMLI', 12, yPos + 28)
-  pdf.text('MMID: 9240564', 12, yPos + 32)
-  pdf.text('Account Type: Current Account', 12, yPos + 36)
+  if (company.branch) {
+    pdf.text(`Branch: ${company.branch}`, 12, yPos + 28)
+    yPos += 4
+  }
+  pdf.text('MMID: 9240564', 12, yPos + 28)
+  pdf.text('Account Type: Current Account', 12, yPos + 32)
   
   // Authorized Signature box with thin border
   pdf.setLineWidth(0.2)
   pdf.rect(150, yPos + 20, 45, 25)
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(7)
-  pdf.text('Authorized Signature', 172, yPos + 40, { align: 'center' })
+  pdf.text('Authorized Signature', 172, yPos + 28, { align: 'center' })
   
-  // Digital signature text under the box
+  // Digital signature text inside the box
   pdf.setFont('helvetica', 'normal')
   pdf.setFontSize(6)
-  pdf.text(`Digitally Signed by ${company.name}`, 172, yPos + 48, { align: 'center' })
+  pdf.text(`Digitally Signed by`, 172, yPos + 36, { align: 'center' })
+  pdf.text(`${companyName || company.name}`, 172, yPos + 40, { align: 'center' })
   
   return pdf
 }

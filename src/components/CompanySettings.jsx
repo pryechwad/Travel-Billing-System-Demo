@@ -261,6 +261,16 @@ const CompanySettings = () => {
                 placeholder="company@paytm"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Branch Name</label>
+              <input
+                type="text"
+                value={tempCompanyDetails.branch || ''}
+                onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, branch: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter branch name"
+              />
+            </div>
           </div>
           <div className="flex gap-4">
             <button

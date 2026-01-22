@@ -3,7 +3,6 @@ import { storage } from '../utils/storage'
 import { getDateRanges, filterInvoicesByDateRange, filterInvoicesByCustomRange } from '../utils/dateFilters'
 import { downloadPDF } from '../utils/pdfGenerator'
 import { downloadReportPDF, generateReportExcel } from '../utils/reportGenerator'
-import { createSampleInvoices } from '../utils/sampleData'
 import { useNotification } from './Notification'
 
 const Dashboard = ({ onCreateInvoice }) => {
@@ -169,13 +168,7 @@ const Dashboard = ({ onCreateInvoice }) => {
     setShowReportModal(false)
   }
 
-  const handleCreateSampleData = () => {
-    createSampleInvoices()
-    const loadedInvoices = storage.getInvoices()
-    setInvoices(loadedInvoices)
-    setFilteredInvoices(loadedInvoices)
-    calculateStats(loadedInvoices)
-  }
+
 
   return (
     <div className="space-y-6">
@@ -194,14 +187,6 @@ const Dashboard = ({ onCreateInvoice }) => {
           <p className="text-gray-600">Manage your tour bookings and invoices</p>
         </div>
         <div className="flex gap-3">
-          {invoices.length === 0 && (
-            <button
-              onClick={handleCreateSampleData}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-medium transition-colors text-sm"
-            >
-              Add Sample Data
-            </button>
-          )}
           <button
             onClick={onCreateInvoice}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
