@@ -312,6 +312,11 @@ export const generateInvoicePDF = (invoice, logo = null, companyName = 'Travel B
   pdf.setFontSize(7)
   pdf.text('Authorized Signature', 172, yPos + 40, { align: 'center' })
   
+  // Digital signature text under the box
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(6)
+  pdf.text(`Digitally Signed by ${company.name}`, 172, yPos + 48, { align: 'center' })
+  
   return pdf
 }
 
