@@ -16,7 +16,9 @@ export const generateInvoicePDF = (invoice, logo = null, companyName = 'Travel B
     accountHolder: companyDetails.accountHolder || companyName || 'TRAVEL BILL PRO',
     accountNumber: companyDetails.accountNumber || '50200095881711',
     ifscCode: companyDetails.ifscCode || 'HDFC0001913',
-    branch: companyDetails.branch // No fallback - only show if user provided
+    branch: companyDetails.branch, // No fallback - only show if user provided
+    mmid: companyDetails.mmid, // No fallback - only show if user provided
+    accountType: companyDetails.accountType // No fallback - only show if user provided
   }
   
   // Main border - thin line
@@ -302,12 +304,19 @@ export const generateInvoicePDF = (invoice, logo = null, companyName = 'Travel B
   pdf.text(`Account Holder: ${company.accountHolder}`, 12, yPos + 16)
   pdf.text(`Account Number: ${company.accountNumber}`, 12, yPos + 20)
   pdf.text(`IFSC: ${company.ifscCode}`, 12, yPos + 24)
+  let currentY = yPos + 28
   if (company.branch) {
-    pdf.text(`Branch: ${company.branch}`, 12, yPos + 28)
-    yPos += 4
+    pdf.text(`Branch: ${company.branch}`, 12, currentY)
+    currentY += 4
   }
-  pdf.text('MMID: 9240564', 12, yPos + 28)
-  pdf.text('Account Type: Current Account', 12, yPos + 32)
+  if (company.mmid) {
+    pdf.text(`MMID: ${company.mmid}`, 12, currentY)
+    currentY += 4
+  }
+  if (company.accountType) {
+    pdf.text(`Account Type: ${company.accountType}`, 12, currentY)
+    currentY += 4
+  }
   
   // Authorized Signature box with thin border
   pdf.setLineWidth(0.2)

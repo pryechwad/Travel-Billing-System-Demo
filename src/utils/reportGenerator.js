@@ -184,7 +184,28 @@ const calculateReportStats = (invoices) => {
 }
 
 export const generateReportExcel = (invoices, dateRange) => {
-  const data = invoices.map(invoice => {
+  // Calculate summary stats
+  const stats = calculateReportStats(invoices)
+  
+  // Create summary data
+  const summaryData = [
+    ['BUSINESS REPORT SUMMARY', ''],
+    ['Report Period', dateRange],
+    ['Generated On', new Date().toLocaleDateString('en-IN') + ' at ' + new Date().toLocaleTimeString('en-IN')],
+    ['', ''],
+    ['EXECUTIVE SUMMARY', ''],
+    ['Total Invoices', stats.totalInvoices],
+    ['Total Revenue', `Rs.${stats.totalRevenue.toLocaleString('en-IN')}`],
+    ['Paid Amount', `Rs.${stats.paidAmount.toLocaleString('en-IN')}`],
+    ['Pending Amount', `Rs.${stats.pendingAmount.toLocaleString('en-IN')}`],
+    ['Completed Tours', stats.completedTours],
+    ['Pending Tours', stats.pendingTours],
+    ['', ''],
+    ['DETAILED INVOICE DATA', '']
+  ]
+  
+  // Create detailed invoice data
+  const invoiceData = invoices.map(invoice => {
     const amount = invoice.items.reduce((sum, item) => sum + (item.qty * item.price), 0)
     const discount = (amount * (invoice.discount || 0)) / 100
     const taxableAmount = amount - discount
@@ -197,20 +218,49 @@ export const generateReportExcel = (invoices, dateRange) => {
       'Customer Name': invoice.customerName,
       'Customer Email': invoice.customerEmail || '',
       'Customer Phone': invoice.customerPhone || '',
+      'Customer Address': invoice.customerAddress || '',
       'Tour Package': invoice.items[0]?.tourName || '',
       'Travelers': invoice.items.reduce((sum, item) => sum + item.qty, 0),
-      'Subtotal': amount,
-      'Discount': discount,
-      'Tax': tax,
-      'Total Amount': total,
-      'Advance Amount': invoice.advanceAmount || 0,
-      'Pending Amount': total - (invoice.advanceAmount || 0),
+      'Subtotal': `Rs.${amount.toLocaleString('en-IN')}`,
+      'Discount (%)': invoice.discount || 0,
+      'Discount Amount': `Rs.${discount.toLocaleString('en-IN')}`,
+      'Tax Rate (%)': invoice.taxRate || 0,
+      'Tax Amount': `Rs.${tax.toLocaleString('en-IN')}`,
+      'Total Amount': `Rs.${total.toLocaleString('en-IN')}`,
+      'Advance Amount': `Rs.${(invoice.advanceAmount || 0).toLocaleString('en-IN')}`,
+      'Pending Amount': `Rs.${(total - (invoice.advanceAmount || 0)).toLocaleString('en-IN')}`,
       'Status': invoice.status || 'Pending',
-      'Payment Mode': invoice.paymentMode || ''
+      'Payment Mode': invoice.paymentMode || '',
+      'Travel Date': invoice.travelDate ? new Date(invoice.travelDate).toLocaleDateString('en-IN') : '',
+      'Due Date': invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-IN') : ''
     }
   })
   
-  const csvContent = convertToCSV(data)
+  // Combine summary and detailed data
+  const allData = [...summaryData, ...invoiceData.map(row => Object.values(row))]
+  
+  // Create headers for detailed data
+  const detailedHeaders = invoiceData.length > 0 ? Object.keys(invoiceData[0]) : []
+  
+  // Create CSV content
+  let csvContent = ''
+  
+  // Add summary section
+  summaryData.forEach(row => {
+    csvContent += row.map(cell => `"${cell}"`).join(',') + '\n'
+  })
+  
+  // Add detailed data headers and rows
+  if (invoiceData.length > 0) {
+    csvContent += detailedHeaders.map(header => `"${header}"`).join(',') + '\n'
+    invoiceData.forEach(row => {
+      const values = detailedHeaders.map(header => `"${row[header]}"`)
+      csvContent += values.join(',') + '\n'
+    })
+  } else {
+    csvContent += '"No invoice data available for the selected period"\n'
+  }
+  
   downloadCSV(csvContent, `Business_Report_${new Date().toISOString().split('T')[0]}.csv`)
 }
 

@@ -271,6 +271,30 @@ const CompanySettings = () => {
                 placeholder="Enter branch name"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">MMID</label>
+              <input
+                type="text"
+                value={tempCompanyDetails.mmid || ''}
+                onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, mmid: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter MMID"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
+              <select
+                value={tempCompanyDetails.accountType || ''}
+                onChange={(e) => setTempCompanyDetails({...tempCompanyDetails, accountType: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select Account Type</option>
+                <option value="Savings Account">Savings Account</option>
+                <option value="Current Account">Current Account</option>
+                <option value="Business Account">Business Account</option>
+                <option value="Salary Account">Salary Account</option>
+              </select>
+            </div>
           </div>
           <div className="flex gap-4">
             <button
